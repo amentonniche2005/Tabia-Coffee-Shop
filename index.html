@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>TA'BIA COFFEE SHOP</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h1>☕ TA'BIA</h1>
+                <p>Commandez en ligne</p>
+            </div>
+            <div class="nav-right">
+                <div class="user-badge">👤 Client</div>
+                <div class="panier" id="panier">
+                    🛒 Panier
+                    <span class="conteur-panier" id="conteurpanier">0</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Commandez en ligne</h1>
+            <p>Préparez votre commande et venez la chercher</p>
+            <div class="info-message">
+                💡 Vos commandes sont transmises directement au comptoir
+            </div>
+        </div>
+    </div>
+
+    <div class="categories">
+        <button class="category-btn active" data-category="all">📋 Tous</button>
+        <button class="category-btn" data-category="cafe">☕ Nos Cafés</button>
+        <button class="category-btn" data-category="boissons">🍹 Nos Boissons</button>
+        <button class="category-btn" data-category="sandwish">🍔 Nos Sandwiches</button>
+        <button class="category-btn" data-category="pd">🥐 Nos Petit Déjeuner</button>
+        <button class="category-btn" data-category="plat">🍽 Nos Plats</button>
+    </div>
+
+    <div class="menu-section">
+        <div class="menu-grid" id="menuGrid"></div>
+    </div>
+
+    <div class="cart-modal" id="cartModal" style="display: none;">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Votre Panier</h2>
+                <span class="close-cart" id="closeCart">&times;</span>
+            </div>
+            <div id="cartItems" class="cart-items"></div>
+            <div class="cart-total" id="cartTotal">Total: 0 DT</div>
+            <button class="checkout-btn" id="checkoutBtn">📱 Commander maintenant</button>
+        </div>
+    </div>
+
+    <div class="tracking-section">
+        <h2>📦 Mes commandes</h2>
+        <div id="mesCommandes" class="commandes-list"></div>
+    </div>
+
+    <footer>
+        <p>23 Avenue souk el-asr</p>
+        <p>Copyright © tout droit réservés</p>
+        <p>tabia@gmail.com</p>
+        <p>71 234 043 / 56 873 298</p>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="script-client.js"></script>
+</body>
+</html>

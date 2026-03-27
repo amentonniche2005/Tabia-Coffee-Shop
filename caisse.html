@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>TA'BIA - Caisse | Gestion des ventes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #1e2a3e;
+            padding-bottom: 2rem;
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        nav {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo h1 {
+            font-size: 1.6rem;
+            color: #e67e22;
+        }
+        .logo p {
+            font-size: 0.85rem;
+            color: #5a6e7c;
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .caisse-badge {
+            background: #27ae60;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .refresh-btn {
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .dashboard {
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 2rem;
+        }
+
+        /* MENU PRODUITS */
+        .menu-container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eef2f6;
+        }
+        .cat-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .cat-btn.active {
+            background: #e67e22;
+            color: white;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+        .product-card {
+            background: #fefefe;
+            border: 1px solid #eef2f6;
+            border-radius: 20px;
+            padding: 1rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.08);
+            border-color: #e67e22;
+        }
+        .product-name {
+            font-weight: 700;
+            margin: 0.5rem 0 0.2rem;
+        }
+        .product-price {
+            color: #e67e22;
+            font-weight: 600;
+        }
+        .add-badge {
+            display: inline-block;
+            margin-top: 8px;
+            background: #e67e2210;
+            color: #e67e22;
+            border-radius: 30px;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+        }
+
+        /* COMMANDES CLIENTS AVEC RECHERCHE */
+        .commandes-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .commandes-header {
+            background: #e67e22;
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .search-box {
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.3rem 0.5rem;
+            border-radius: 40px;
+            align-items: center;
+        }
+        .search-box i {
+            color: #e67e22;
+        }
+        .search-box input {
+            border: none;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            outline: none;
+            width: 200px;
+            border-radius: 30px;
+        }
+        .search-box input::placeholder {
+            color: #aaa;
+        }
+        .search-box button {
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .search-box button:hover {
+            background: #d35400;
+        }
+        .clear-search {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .commandes-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        .commande-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #edf2f7;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+        .commande-item:hover {
+            background: #fef9f0;
+        }
+        .commande-item.selected {
+            background: #fff3e0;
+            border-left: 4px solid #e67e22;
+        }
+        .commande-item.editing {
+            background: #ffe6cc;
+            border-left: 4px solid #27ae60;
+        }
+        .commande-header-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .commande-numero {
+            font-weight: bold;
+            color: #e67e22;
+            font-size: 1rem;
+        }
+        .commande-table {
+            background: #eef2f6;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .commande-date {
+            font-size: 0.7rem;
+            color: #7f8c8d;
+            margin-bottom: 0.5rem;
+        }
+        .commande-preview {
+            font-size: 0.8rem;
+            color: #5a6e7c;
+        }
+        .commande-total-preview {
+            font-weight: bold;
+            margin-top: 0.5rem;
+            color: #e67e22;
+        }
+        .edit-badge {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            background: #27ae60;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 20px;
+        }
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #94a3b8;
+        }
+
+        /* TICKET DE CAISSE */
+        .ticket-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .ticket-header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ticket-items {
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 0.5rem 0;
+        }
+        .ticket-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .item-info {
+            flex: 2;
+        }
+        .item-name {
+            font-weight: 600;
+        }
+        .item-price {
+            font-size: 0.8rem;
+            color: #5a6e7c;
+        }
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 30px;
+        }
+        .qty-control button {
+            background: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            border-radius: 30px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .qty-control button:hover {
+            background: #e67e22;
+            color: white;
+        }
+        .remove-item {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        .ticket-total {
+            padding: 1rem 1.5rem;
+            border-top: 2px dashed #e2e8f0;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            background: #fafcff;
+        }
+        .ticket-actions {
+            padding: 1rem 1.5rem 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .btn-payer {
+            background: #27ae60;
+            color: white;
+            border: none;
+            flex: 2;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-payer-partial {
+            background: #3498db;
+            color: white;
+            border: none;
+            flex: 1;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-vider {
+            background: #e2e8f0;
+            border: none;
+            flex: 1;
+            border-radius: 40px;
+            cursor: pointer;
+            padding: 12px;
+        }
+        .btn-new-ticket {
+            background: #e67e22;
+            color: white;
+            border: none;
+            flex: 1;
+            border-radius: 40px;
+            cursor: pointer;
+            padding: 12px;
+            font-weight: bold;
+        }
+        .btn-commande-manuelle {
+            background: #9b59b6;
+            color: white;
+            border: none;
+            flex: 1;
+            border-radius: 40px;
+            cursor: pointer;
+            padding: 12px;
+            font-weight: bold;
+        }
+        .btn-print-ticket {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            flex: 1;
+            border-radius: 40px;
+            cursor: pointer;
+            padding: 12px;
+            font-weight: bold;
+        }
+
+        /* HISTORIQUE */
+        .historique-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .historique-header {
+            background: #34495e;
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+        }
+        .historique-list {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        .vente-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .vente-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .vente-produits {
+            font-size: 0.75rem;
+            background: #f1f5f9;
+            padding: 6px 8px;
+            border-radius: 12px;
+            margin-top: 6px;
+        }
+        .empty-message {
+            text-align: center;
+            padding: 2rem;
+            color: #94a3b8;
+        }
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2c3e50;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            z-index: 1000;
+            animation: fadeInUp 0.3s ease;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .info-bar {
+            background: #ecf0f1;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.85rem;
+            color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #d5dbdb;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .info-bar-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .info-bar-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+        .btn-exit-edit {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-save-edit {
+            background: #27ae60;
+            color: white;
+        }
+        @media (max-width: 1000px) {
+            .dashboard { grid-template-columns: 1fr; padding: 1rem; }
+            .search-box input { width: 150px; }
+        }
+        
+        /* Styles pour le regroupement par table */
+        .groupe-table {
+            border: 1px solid #eef2f6;
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            overflow: hidden;
+            background: white;
+        }
+        .groupe-table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .groupe-table-header:hover {
+            background: #f1f5f9;
+        }
+        .groupe-table-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .groupe-table-info i {
+            color: #e67e22;
+            font-size: 1rem;
+        }
+        .groupe-table-count {
+            color: #7f8c8d;
+            font-size: 0.75rem;
+        }
+        .groupe-table-total {
+            font-weight: bold;
+            color: #27ae60;
+            font-size: 0.9rem;
+        }
+        .groupe-toggle-icon {
+            color: #95a5a6;
+            transition: transform 0.2s;
+        }
+        .groupe-table-content {
+            border-top: 1px solid #eef2f6;
+        }
+        .commande-statut {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .statut-en_attente {
+            background: #f39c12;
+            color: white;
+        }
+        .statut-en_preparation {
+            background: #3498db;
+            color: white;
+        }
+        .statut-terminee {
+            background: #27ae60;
+            color: white;
+        }
+        
+        /* STYLES TICKET DE CAISSE POUR IMPRESSION */
+        .ticket-caisse {
+            width: 80mm;
+            max-width: 80mm;
+            background: white;
+            padding: 8px 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            line-height: 1.4;
+            margin: 0 auto;
+            display: none;
+        }
+        @media print {
+            @page { size: 80mm auto; margin: 0; }
+            body * { visibility: hidden; }
+            .ticket-caisse, .ticket-caisse * { visibility: visible; }
+            .ticket-caisse { display: block; position: absolute; top: 0; left: 0; width: 100%; }
+        }
+        .ticket-caisse-header { text-align: center; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px dashed #aaa; }
+        .ticket-caisse-header h2 { font-size: 14px; margin: 3px 0; }
+        .ticket-caisse-header p { font-size: 8px; margin: 2px 0; color: #666; }
+        .ticket-separateur { text-align: center; margin: 5px 0; letter-spacing: 1px; color: #aaa; }
+        .ticket-info-row { display: flex; justify-content: space-between; margin: 4px 0; font-size: 9px; }
+        .ticket-info-label { font-weight: bold; }
+        .ticket-articles { margin: 6px 0; border-top: 1px dashed #aaa; border-bottom: 1px dashed #aaa; padding: 5px 0; }
+        .ticket-article { display: flex; justify-content: space-between; margin: 3px 0; }
+        .ticket-article-nom { flex: 2; }
+        .ticket-article-qty { width: 35px; text-align: center; }
+        .ticket-article-prix { width: 50px; text-align: right; }
+        .ticket-total-row { display: flex; justify-content: space-between; margin: 5px 0; font-weight: bold; font-size: 11px; border-top: 1px dashed #aaa; padding-top: 5px; }
+        .ticket-footer { text-align: center; margin-top: 8px; padding-top: 5px; border-top: 1px dashed #aaa; font-size: 8px; color: #666; }
+        .ticket-merci { text-align: center; margin-top: 5px; font-weight: bold; font-size: 10px; }
+        .ticket-coupe { text-align: center; margin-top: 8px; letter-spacing: 2px; color: #aaa; font-size: 12px; }
+        
+        /* STATISTIQUES PRODUITS VENDUS */
+        .stats-produits-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .stats-produits-header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .stats-produits-header h3 { font-size: 1rem; margin: 0; display: flex; align-items: center; gap: 0.5rem; }
+        .stats-produits-toggle { transition: transform 0.3s; }
+        .stats-produits-content { max-height: 400px; overflow-y: auto; padding: 1rem; display: none; }
+        .stats-produits-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .stats-produits-table th, .stats-produits-table td { padding: 0.75rem 0.5rem; text-align: left; border-bottom: 1px solid #eef2f6; }
+        .stats-produits-table th { background: #f8fafc; font-weight: 600; color: #2c3e50; }
+        .stats-produits-table .produit-quantite { text-align: center; font-weight: bold; color: #e67e22; }
+        .stats-produits-table .produit-total { text-align: right; font-weight: bold; color: #27ae60; }
+        .stats-produits-total { margin-top: 1rem; padding-top: 0.75rem; border-top: 2px solid #eef2f6; display: flex; justify-content: space-between; font-weight: bold; }
+        .stats-produits-total span:last-child { color: #27ae60; font-size: 1.1rem; }
+        .stats-reset-btn { background: #e74c3c; color: white; border: none; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; }
+        
+        /* MODAL PAIEMENT */
+        .modal-paiement {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-paiement-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .modal-paiement-content .montant-total {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e67e22;
+            margin: 0.5rem 0;
+        }
+        .mode-paiement-select { margin: 1rem 0; text-align: left; }
+        .mode-paiement-select select { width: 100%; padding: 0.8rem; border: 2px solid #e9ecef; border-radius: 10px; }
+        .montant-recu-div { margin: 1rem 0; text-align: left; }
+        .montant-recu-div input { width: 100%; padding: 0.8rem; border: 2px solid #e9ecef; border-radius: 10px; text-align: right; }
+        .monnaie-div { margin: 0.5rem 0; padding: 0.8rem; background: #f0f0f0; border-radius: 10px; display: none; }
+        .paiement-buttons { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .paiement-buttons button { flex: 1; padding: 0.8rem; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-valider-paiement { background: #27ae60; color: white; }
+        .btn-annuler-paiement { background: #7f8c8d; color: white; }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <div class="logo">
+            <h1>🍽️ TA'BIA - Caisse</h1>
+            <p>Gestion des commandes & encaissements</p>
+        </div>
+        <div class="nav-right">
+            <div class="caisse-badge"><i class="fas fa-cash-register"></i> Mode caisse</div>
+            <button class="refresh-btn" id="resetStatsBtn"><i class="fas fa-chart-line"></i> Réinitialiser stats</button>
+        </div>
+    </nav>
+</header>
+
+<div class="dashboard">
+    <div class="menu-container">
+        <div class="categories" id="categoriesContainer"></div>
+        <div class="products-grid" id="productsGrid"></div>
+    </div>
+
+    <div class="right-panel">
+        <!-- Commandes clients -->
+        <div class="commandes-card">
+            <div class="commandes-header">
+                <span><i class="fas fa-users"></i> Commandes clients</span>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="N° commande ou table..." autocomplete="off">
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                    <button id="clearSearchBtn" class="clear-search"><i class="fas fa-times"></i></button>
+                </div>
+                <span id="commandesCount">0 en attente</span>
+            </div>
+            <div id="commandesList" class="commandes-list">
+                <div class="empty-message">Aucune commande en attente</div>
+            </div>
+        </div>
+
+        <!-- Ticket -->
+        <div class="ticket-card">
+            <div class="ticket-header">
+                <span><i class="fas fa-receipt"></i> <span id="ticketTitle">Nouveau ticket</span></span>
+                <span id="articleCount">0 article</span>
+            </div>
+            <div id="commandeInfo" class="info-bar" style="display:none;">
+                <span><strong>📋 Commande #<span id="currentCommandeNumero">-</span></strong> | 🪑 Table <span id="currentCommandeTable">-</span></span>
+                <div class="info-bar-actions">
+                    <button id="saveChangesBtn" class="btn-save-edit"><i class="fas fa-save"></i> Sauvegarder</button>
+                    <button id="cancelEditBtn" class="btn-exit-edit"><i class="fas fa-times"></i> Annuler</button>
+                </div>
+            </div>
+            <div class="ticket-items" id="ticketItemsList">
+                <div class="empty-message">Aucun article</div>
+            </div>
+            <div class="ticket-total">
+                <span>Total à payer</span>
+                <span id="ticketTotal">0.00 DT</span>
+            </div>
+            <div class="ticket-actions">
+                <button class="btn-vider" id="clearTicketBtn"><i class="fas fa-trash-alt"></i> Vider</button>
+                <button class="btn-new-ticket" id="newTicketBtn"><i class="fas fa-plus-circle"></i> Nouveau</button>
+                <button class="btn-commande-manuelle" id="commandeManuelleBtn"><i class="fas fa-plus"></i> Créer commande</button>
+                <button class="btn-payer-partial" id="partialPayBtn"><i class="fas fa-coins"></i> Payer sélection</button>
+                <button class="btn-payer" id="checkoutBtn"><i class="fas fa-hand-holding-usd"></i> Payer</button>
+                <button class="btn-print-ticket" id="printTicketBtn"><i class="fas fa-print"></i> Imprimer</button>
+            </div>
+        </div>
+
+        <!-- Historique -->
+        <div class="historique-card">
+            <div class="historique-header">
+                <span><i class="fas fa-history"></i> Historique des ventes</span>
+            </div>
+            <div id="historiqueList" class="historique-list">
+                <div class="empty-message">Aucune vente</div>
+            </div>
+        </div>
+        
+        <!-- Statistiques produits -->
+        <div class="stats-produits-card">
+            <div class="stats-produits-header" onclick="toggleStatsProduits()">
+                <h3><i class="fas fa-chart-simple"></i> Produits vendus (aujourd'hui)</h3>
+                <div>
+                    <button id="resetProduitsBtn" class="stats-reset-btn" onclick="event.stopPropagation(); resetStatsProduits()">
+                        <i class="fas fa-trash-alt"></i> Réinitialiser
+                    </button>
+                    <i class="fas fa-chevron-down stats-produits-toggle" id="statsToggleIcon"></i>
+                </div>
+            </div>
+            <div class="stats-produits-content" id="statsProduitsContent">
+                <table class="stats-produits-table">
+                    <thead><tr><th>Produit</th><th style="text-align:center">Qté</th><th style="text-align:right">Total</th></tr></thead>
+                    <tbody id="statsProduitsBody"><tr><td colspan="3" class="empty-message">Aucune vente aujourd'hui</td></tr></tbody>
+                </table>
+                <div class="stats-produits-total"><span>Total des ventes du jour :</span><span id="statsTotalJour">0.00 DT</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer>TA'BIA - Caisse · Rechercher par numéro de commande ou table</footer>
+
+<!-- Ticket d'impression -->
+<div id="ticketCaisse" class="ticket-caisse" style="display: none;">
+    <div class="ticket-caisse-header">
+        <h2>☕ TA'BIA Coffee Shop</h2>
+        <p>23 Avenue souk el-asr, Tunis</p>
+        <p>Tel: 71 234 043</p>
+    </div>
+    <div class="ticket-separateur">----------------------------</div>
+    <div id="ticketInfos">
+        <div class="ticket-info-row"><span class="ticket-info-label">Ticket N°:</span><span id="ticketNumero">---</span></div>
+        <div class="ticket-info-row"><span class="ticket-info-label">Date:</span><span id="ticketDate">---</span></div>
+        <div class="ticket-info-row"><span class="ticket-info-label">Table:</span><span id="ticketTable">---</span></div>
+    </div>
+    <div class="ticket-separateur">----------------------------</div>
+    <div class="ticket-articles" id="ticketArticlesList"></div>
+    <div class="ticket-total-row"><span>TOTAL</span><span id="ticketTotalPrint">0.00 DT</span></div>
+    <div class="ticket-separateur">----------------------------</div>
+    <div class="ticket-footer"><p>Merci de votre visite !</p><p>À bientôt chez TA'BIA</p></div>
+    <div class="ticket-merci">🍽️ Bon appétit ! 🍽️</div>
+    <div class="ticket-coupe">. . . . . . . . . . . . . . . .</div>
+</div>
+
+<script>
+    // ========== PRODUITS ==========
+    const produits = [
+        { id: 1, nom: "Espresso", prix: 2.500, categorie: "cafe" },
+        { id: 2, nom: "Cappuccino", prix: 3.800, categorie: "cafe" },
+        { id: 3, nom: "Latte Macchiato", prix: 4.200, categorie: "cafe" },
+        { id: 4, nom: "Jus d'orange", prix: 4.500, categorie: "boissons" },
+        { id: 5, nom: "Citronnade", prix: 3.500, categorie: "boissons" },
+        { id: 6, nom: "Hamburger", prix: 8.500, categorie: "sandwish" },
+        { id: 7, nom: "Sandwich Mixte", prix: 6.500, categorie: "sandwish" },
+        { id: 8, nom: "Croissant", prix: 2.500, categorie: "pd" },
+        { id: 9, nom: "Pain au Chocolat", prix: 2.800, categorie: "pd" },
+        { id: 10, nom: "Pasta Carbonara", prix: 12.900, categorie: "plat" }
+    ];
+
+    let commandesClients = [];      
+    let commandesFiltrees = [];
+    let currentEditingCommande = null;
+    let currentTicket = [];              
+    let salesHistory = [];
+    let activeCategory = "all";
+    let rechercheActuelle = "";
+    let statsProduits = {}; 
+    let statsTotalJour = 0;
+    let modePaiementActuel = "especes";
+
+    // DOM Elements
+    const productsGrid = document.getElementById('productsGrid');
+    const categoriesContainer = document.getElementById('categoriesContainer');
+    const ticketItemsList = document.getElementById('ticketItemsList');
+    const ticketTotalSpan = document.getElementById('ticketTotal');
+    const articleCountSpan = document.getElementById('articleCount');
+    const historiqueListDiv = document.getElementById('historiqueList');
+    const commandesListDiv = document.getElementById('commandesList');
+    const commandesCountSpan = document.getElementById('commandesCount');
+    const ticketTitleSpan = document.getElementById('ticketTitle');
+    const commandeInfoDiv = document.getElementById('commandeInfo');
+    const currentCommandeNumero = document.getElementById('currentCommandeNumero');
+    const currentCommandeTable = document.getElementById('currentCommandeTable');
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+    // ========== LOCALSTORAGE ==========
+    function sauvegarderCommandes() {
+        localStorage.setItem('tabia_commandes_clients', JSON.stringify(commandesClients));
+    }
+
+    function chargerCommandes() {
+        const stored = localStorage.getItem('tabia_commandes_clients');
+        if (stored) {
+            try {
+                commandesClients = JSON.parse(stored);
+            } catch(e) { commandesClients = []; }
+        }
+        appliquerRecherche();
+    }
+
+    function sauvegarderHistorique() {
+        localStorage.setItem('tabia_caisse_history', JSON.stringify(salesHistory));
+    }
+
+    function chargerHistorique() {
+        const stored = localStorage.getItem('tabia_caisse_history');
+        if (stored) {
+            try {
+                salesHistory = JSON.parse(stored);
+            } catch(e) { salesHistory = []; }
+        }
+        renderHistorique();
+    }
+
+    // ========== RECHERCHE ==========
+    function rechercherCommandes(terme) {
+        if (!terme || terme.trim() === "") {
+            return commandesClients.filter(c => c.articles && c.articles.length > 0 && c.statut !== 'paye');
+        }
+        const searchLower = terme.toLowerCase().trim();
+        return commandesClients.filter(cmd => {
+            if (!cmd.articles || cmd.articles.length === 0 || cmd.statut === 'paye') return false;
+            const numeroMatch = cmd.numero && cmd.numero.toLowerCase().includes(searchLower);
+            const tableMatch = cmd.numeroTable && cmd.numeroTable.toString().includes(searchLower);
+            return numeroMatch || tableMatch;
+        });
+    }
+
+    function appliquerRecherche() {
+        commandesFiltrees = rechercherCommandes(rechercheActuelle);
+        mettreAJourAffichageCommandes();
+    }
+
+    function effectuerRecherche() {
+        rechercheActuelle = searchInput.value;
+        appliquerRecherche();
+        const count = commandesFiltrees.length;
+        if (rechercheActuelle && count === 0) showNotification(`🔍 Aucune commande trouvée`, "#e74c3c");
+        else if (rechercheActuelle) showNotification(`🔍 ${count} commande(s) trouvée(s)`, "#27ae60");
+    }
+
+    function effacerRecherche() {
+        searchInput.value = "";
+        rechercheActuelle = "";
+        appliquerRecherche();
+        showNotification("🔍 Recherche effacée", "#3498db");
+    }
+
+    // ========== AFFICHAGE PRODUITS ==========
+    function getCategories() {
+        const cats = new Set();
+        produits.forEach(p => { if(p.categorie) cats.add(p.categorie); });
+        return Array.from(cats);
+    }
+
+    function renderCategories() {
+        const categories = getCategories();
+        let html = `<button class="cat-btn ${activeCategory === 'all' ? 'active' : ''}" data-cat="all">Tous</button>`;
+        const labels = { cafe: "☕ Cafés", boissons: "🥤 Boissons", sandwish: "🥪 Sandwiches", pd: "🍰 Pâtisseries", plat: "🍛 Plats" };
+        categories.forEach(cat => {
+            html += `<button class="cat-btn ${activeCategory === cat ? 'active' : ''}" data-cat="${cat}">${labels[cat] || cat}</button>`;
+        });
+        categoriesContainer.innerHTML = html;
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeCategory = btn.dataset.cat;
+                renderCategories();
+                renderProducts();
+            });
+        });
+    }
+
+    function renderProducts() {
+        let filtered = activeCategory === "all" ? produits : produits.filter(p => p.categorie === activeCategory);
+        if (filtered.length === 0) {
+            productsGrid.innerHTML = '<div class="empty-message">Aucun produit</div>';
+            return;
+        }
+        productsGrid.innerHTML = filtered.map(p => `
+            <div class="product-card" data-id="${p.id}" data-nom="${p.nom}" data-prix="${p.prix}">
+                <div class="product-name">${p.nom}</div>
+                <div class="product-price">${p.prix.toFixed(2)} DT</div>
+                <div class="add-badge"><i class="fas fa-plus-circle"></i> Ajouter</div>
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const id = parseInt(card.dataset.id);
+                const nom = card.dataset.nom;
+                const prix = parseFloat(card.dataset.prix);
+                ajouterAuTicket(id, nom, prix);
+                showNotification(`➕ ${nom} ajouté`);
+            });
+        });
+    }
+
+    // ========== GESTION DU TICKET ==========
+    function ajouterAuTicket(id, nom, prix, quantite = 1) {
+        const existing = currentTicket.find(item => item.id === id);
+        if (existing) {
+            existing.quantite += quantite;
+        } else {
+            currentTicket.push({ id, nom, prix, quantite });
+        }
+        renderTicket();
+    }
+
+    function modifierQuantite(id, delta) {
+        const index = currentTicket.findIndex(item => item.id === id);
+        if (index !== -1) {
+            const newQty = currentTicket[index].quantite + delta;
+            if (newQty <= 0) {
+                currentTicket.splice(index, 1);
+            } else {
+                currentTicket[index].quantite = newQty;
+            }
+            renderTicket();
+        }
+    }
+
+    function supprimerArticle(id) {
+        currentTicket = currentTicket.filter(item => item.id !== id);
+        renderTicket();
+    }
+
+    function viderTicket() {
+        if (currentTicket.length === 0) return;
+        if (confirm("Vider le ticket ?")) {
+            currentTicket = [];
+            renderTicket();
+            showNotification("🧾 Ticket vidé");
+        }
+    }
+
+    function nouveauTicket() {
+        if (currentEditingCommande) {
+            if (confirm("Annuler les modifications en cours et créer un nouveau ticket ?")) {
+                annulerEdition();
+            } else {
+                return;
+            }
+        }
+        currentEditingCommande = null;
+        currentTicket = [];
+        ticketTitleSpan.innerText = "Nouveau ticket";
+        commandeInfoDiv.style.display = 'none';
+        renderTicket();
+        appliquerRecherche();
+    }
+
+    function renderTicket() {
+        if (currentTicket.length === 0) {
+            ticketItemsList.innerHTML = '<div class="empty-message">Aucun article</div>';
+            ticketTotalSpan.innerText = "0.00 DT";
+            articleCountSpan.innerText = "0 article";
+            return;
+        }
+        let total = 0;
+        let totalArticles = 0;
+        let html = '';
+        currentTicket.forEach(item => {
+            total += item.prix * item.quantite;
+            totalArticles += item.quantite;
+            html += `
+                <div class="ticket-item">
+                    <div class="item-info">
+                        <div class="item-name">${item.nom}</div>
+                        <div class="item-price">${item.prix.toFixed(2)} DT</div>
+                    </div>
+                    <div class="item-actions">
+                        <div class="qty-control">
+                            <button class="qty-minus" data-id="${item.id}">-</button>
+                            <span>${item.quantite}</span>
+                            <button class="qty-plus" data-id="${item.id}">+</button>
+                        </div>
+                        <button class="remove-item" data-id="${item.id}"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+        ticketItemsList.innerHTML = html;
+        ticketTotalSpan.innerText = total.toFixed(2) + " DT";
+        articleCountSpan.innerText = totalArticles + (totalArticles > 1 ? " articles" : " article");
+        
+        document.querySelectorAll('.qty-minus').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                modifierQuantite(parseInt(btn.dataset.id), -1);
+            });
+        });
+        document.querySelectorAll('.qty-plus').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                modifierQuantite(parseInt(btn.dataset.id), 1);
+            });
+        });
+        document.querySelectorAll('.remove-item').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                supprimerArticle(parseInt(btn.dataset.id));
+            });
+        });
+    }
+
+    // ========== GESTION COMMANDES ==========
+    function selectionnerCommandePourEdition(commande) {
+        if (currentEditingCommande && currentEditingCommande.id !== commande.id) {
+            if (confirm("Vous avez des modifications non sauvegardées. Les annuler et ouvrir cette commande ?")) {
+                annulerEdition();
+            } else {
+                return;
+            }
+        }
+        currentEditingCommande = JSON.parse(JSON.stringify(commande));
+        currentTicket = JSON.parse(JSON.stringify(commande.articles));
+        ticketTitleSpan.innerText = `Modification commande #${commande.numero}`;
+        commandeInfoDiv.style.display = 'flex';
+        currentCommandeNumero.innerText = commande.numero;
+        currentCommandeTable.innerText = commande.numeroTable || 'Emporter';
+        renderTicket();
+        appliquerRecherche();
+    }
+
+    function sauvegarderModifications() {
+        if (!currentEditingCommande) {
+            showNotification("Aucune commande en cours d'édition", "#e74c3c");
+            return;
+        }
+        if (currentTicket.length === 0) {
+            if (confirm("Le ticket est vide. Supprimer cette commande ?")) {
+                commandesClients = commandesClients.filter(c => c.id !== currentEditingCommande.id);
+                sauvegarderCommandes();
+                annulerEdition();
+                showNotification(`✅ Commande #${currentEditingCommande.numero} supprimée`, "#27ae60");
+            }
+            return;
+        }
+        currentEditingCommande.articles = JSON.parse(JSON.stringify(currentTicket));
+        const index = commandesClients.findIndex(c => c.id === currentEditingCommande.id);
+        if (index !== -1) {
+            commandesClients[index] = currentEditingCommande;
+        } else {
+            commandesClients.push(currentEditingCommande);
+        }
+        sauvegarderCommandes();
+        showNotification(`✅ Commande #${currentEditingCommande.numero} modifiée`, "#27ae60");
+        annulerEdition();
+    }
+
+    function annulerEdition() {
+        currentEditingCommande = null;
+        currentTicket = [];
+        ticketTitleSpan.innerText = "Nouveau ticket";
+        commandeInfoDiv.style.display = 'none';
+        renderTicket();
+        appliquerRecherche();
+    }
+
+    // ========== PAIEMENT ==========
+    function afficherModalPaiement() {
+        if (currentTicket.length === 0) {
+            showNotification("❌ Aucun article à payer", "#e74c3c");
+            return;
+        }
+        const total = currentTicket.reduce((sum, i) => sum + (i.prix * i.quantite), 0);
+        const modalHtml = `
+            <div id="modalPaiement" class="modal-paiement">
+                <div class="modal-paiement-content">
+                    <h3>💳 Paiement</h3>
+                    <div class="montant-total">${total.toFixed(2)} DT</div>
+                    <div class="mode-paiement-select">
+                        <label>Mode de paiement :</label>
+                        <select id="selectModePaiement">
+                            <option value="especes">💰 Espèces</option>
+                            <option value="carte">💳 Carte bancaire</option>
+                            <option value="mobile">📱 Mobile (D17/Flash)</option>
+                        </select>
+                    </div>
+                    <div id="montantRecuDiv" class="montant-recu-div">
+                        <label>Montant reçu (DT) :</label>
+                        <input type="number" id="montantRecuInput" step="0.1" value="${total}">
+                    </div>
+                    <div id="monnaieDiv" class="monnaie-div">
+                        <strong>💰 Monnaie à rendre :</strong> <span id="monnaieRendre">0.00</span> DT
+                    </div>
+                    <div class="paiement-buttons">
+                        <button id="validerPaiementBtn" class="btn-valider-paiement">✅ Valider</button>
+                        <button id="annulerPaiementBtn" class="btn-annuler-paiement">❌ Annuler</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        const oldModal = document.getElementById("modalPaiement");
+        if (oldModal) oldModal.remove();
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = document.getElementById("modalPaiement");
+        const selectMode = document.getElementById("selectModePaiement");
+        const montantRecuDiv = document.getElementById("montantRecuDiv");
+        const montantRecuInput = document.getElementById("montantRecuInput");
+        const monnaieDiv = document.getElementById("monnaieDiv");
+        const monnaieSpan = document.getElementById("monnaieRendre");
+        const closeModal = () => modal.remove();
+        
+        selectMode.addEventListener('change', () => {
+            modePaiementActuel = selectMode.value;
+            if (modePaiementActuel === "especes") {
+                montantRecuDiv.style.display = "block";
+                monnaieDiv.style.display = "none";
+            } else {
+                montantRecuDiv.style.display = "none";
+                monnaieDiv.style.display = "none";
+            }
+        });
+        montantRecuInput.addEventListener('input', () => {
+            const recu = parseFloat(montantRecuInput.value) || 0;
+            const totalCalc = currentTicket.reduce((sum, i) => sum + (i.prix * i.quantite), 0);
+            const monnaie = recu - totalCalc;
+            if (monnaie >= 0 && recu > 0) {
+                monnaieSpan.textContent = monnaie.toFixed(2);
+                monnaieDiv.style.display = "block";
+            } else {
+                monnaieDiv.style.display = "none";
+            }
+        });
+        document.getElementById("validerPaiementBtn").addEventListener('click', () => {
+            const totalCalc = currentTicket.reduce((sum, i) => sum + (i.prix * i.quantite), 0);
+            if (modePaiementActuel === "especes") {
+                const recu = parseFloat(montantRecuInput.value) || 0;
+                if (recu < totalCalc) {
+                    showNotification("❌ Montant insuffisant !", "#e74c3c");
+                    return;
+                }
+                const monnaie = recu - totalCalc;
+                if (monnaie > 0) showNotification(`💰 Monnaie à rendre : ${monnaie.toFixed(2)} DT`, "#27ae60");
+            }
+            closeModal();
+            executerPaiementAvecMode();
+        });
+        document.getElementById("annulerPaiementBtn").addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    }
+
+    function executerPaiementAvecMode() {
+        if (currentTicket.length === 0) return;
+        const total = currentTicket.reduce((sum, i) => sum + (i.prix * i.quantite), 0);
+        const modeTexte = { especes: "Espèces", carte: "Carte bancaire", mobile: "Mobile (D17/Flash)" };
+        
+        if (currentEditingCommande) {
+            const vente = {
+                id: Date.now(),
+                numero: currentEditingCommande.numero,
+                date: new Date().toLocaleString(),
+                timestamp: Date.now(),
+                total: total,
+                mode: modeTexte[modePaiementActuel],
+                type: "client",
+                numeroTable: currentEditingCommande.numeroTable,
+                articles: currentTicket.map(a => ({ nom: a.nom, quantite: a.quantite, prix: a.prix }))
+            };
+            salesHistory.unshift(vente);
+            sauvegarderHistorique();
+            renderHistorique();
+            ajouterVenteStats(currentTicket);
+            commandesClients = commandesClients.filter(c => c.id !== currentEditingCommande.id);
+            sauvegarderCommandes();
+            showNotification(`✅ Commande #${currentEditingCommande.numero} payée (${total.toFixed(2)} DT) - ${modeTexte[modePaiementActuel]}`, "#27ae60");
+            if (confirm("🖨️ Souhaitez-vous imprimer le ticket ?")) imprimerTicketCaisse();
+            annulerEdition();
+        } else {
+            const venteNumero = "M" + Math.floor(Math.random() * 10000);
+            const vente = {
+                id: Date.now(),
+                numero: venteNumero,
+                date: new Date().toLocaleString(),
+                timestamp: Date.now(),
+                total: total,
+                mode: modeTexte[modePaiementActuel],
+                type: "manuelle",
+                articles: currentTicket.map(a => ({ nom: a.nom, quantite: a.quantite, prix: a.prix }))
+            };
+            salesHistory.unshift(vente);
+            sauvegarderHistorique();
+            renderHistorique();
+            ajouterVenteStats(currentTicket);
+            currentTicket = [];
+            renderTicket();
+            showNotification(`✅ Vente ${venteNumero} encaissée (${total.toFixed(2)} DT) - ${modeTexte[modePaiementActuel]}`, "#27ae60");
+            if (confirm("🖨️ Souhaitez-vous imprimer le ticket ?")) imprimerTicketCaisse();
+        }
+        appliquerRecherche();
+    }
+
+    // ========== COMMANDE MANUELLE ==========
+    function creerCommandeManuelle() {
+        if (currentTicket.length === 0) {
+            showNotification("❌ Aucun article à commander", "#e74c3c");
+            return;
+        }
+        const total = currentTicket.reduce((sum, i) => sum + (i.prix * i.quantite), 0);
+        const tableNum = prompt("🪑 Numéro de table (laisser vide pour emporter) :", "");
+        const numeroTable = tableNum && !isNaN(parseInt(tableNum)) ? parseInt(tableNum) : null;
+        const commandeNumero = "CMD" + Math.floor(Math.random() * 10000);
+        const commandeManuelle = {
+            id: Date.now(),
+            numero: commandeNumero,
+            date: new Date().toLocaleString(),
+            timestamp: Date.now(),
+            articles: currentTicket.map(a => ({ id: a.id, nom: a.nom, prix: a.prix, quantite: a.quantite })),
+            numeroTable: numeroTable,
+            clientId: null,
+            statut: 'en_attente',
+            total: total,
+            type: "manuelle"
+        };
+        let commandesExistantes = [];
+        const stored = localStorage.getItem('tabia_commandes_clients');
+        if (stored) {
+            try {
+                commandesExistantes = JSON.parse(stored);
+                if (!Array.isArray(commandesExistantes)) commandesExistantes = [];
+            } catch(e) { commandesExistantes = []; }
+        }
+        commandesExistantes.push(commandeManuelle);
+        localStorage.setItem('tabia_commandes_clients', JSON.stringify(commandesExistantes));
+        window.dispatchEvent(new StorageEvent('storage', { key: 'tabia_commandes_clients', newValue: JSON.stringify(commandesExistantes) }));
+        currentTicket = [];
+        renderTicket();
+        showNotification(`✅ Commande #${commandeNumero} créée${numeroTable ? ` (Table ${numeroTable})` : ' (Emporter)'}`, "#27ae60");
+        appliquerRecherche();
+    }
+
+    // ========== IMPRESSION ==========
+    function imprimerTicketCaisse() {
+        if (currentTicket.length === 0) {
+            showNotification("❌ Aucun article à imprimer", "#e74c3c");
+            return;
+        }
+        const total = currentTicket.reduce((sum, i) => sum + (i.prix * i.quantite), 0);
+        const now = new Date();
+        const ticketNumero = currentEditingCommande ? `CMD-${currentEditingCommande.numero}` : `TKT-${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}-${now.getHours()}${now.getMinutes()}${now.getSeconds()}`;
+        document.getElementById('ticketNumero').textContent = ticketNumero;
+        document.getElementById('ticketDate').textContent = now.toLocaleString();
+        const tableInfo = currentEditingCommande?.numeroTable || 'Emporter';
+        document.getElementById('ticketTable').textContent = tableInfo === 'Emporter' ? '📦 À Emporter' : `Table ${tableInfo}`;
+        let articlesHtml = '';
+        currentTicket.forEach(item => {
+            articlesHtml += `<div class="ticket-article"><span class="ticket-article-nom">${item.nom}</span><span class="ticket-article-qty">x${item.quantite}</span><span class="ticket-article-prix">${(item.prix * item.quantite).toFixed(2)} DT</span></div>`;
+        });
+        document.getElementById('ticketArticlesList').innerHTML = `<div class="ticket-article" style="font-weight:bold;border-bottom:1px dashed #aaa;margin-bottom:5px;"><span>Article</span><span>Qté</span><span>Prix</span></div>${articlesHtml}`;
+        document.getElementById('ticketTotalPrint').textContent = `${total.toFixed(2)} DT`;
+        const ticketElement = document.getElementById('ticketCaisse');
+        ticketElement.style.display = 'block';
+        setTimeout(() => { window.print(); setTimeout(() => { ticketElement.style.display = 'none'; }, 100); }, 100);
+        showNotification("🖨️ Impression du ticket...", "#3498db");
+    }
+
+    // ========== STATISTIQUES PRODUITS ==========
+    function chargerStatsProduits() {
+        const stored = localStorage.getItem('tabia_stats_produits');
+        if (stored) {
+            try {
+                const data = JSON.parse(stored);
+                statsProduits = data.produits || {};
+                statsTotalJour = data.totalJour || 0;
+                const aujourdhui = new Date().toLocaleDateString();
+                if (data.date !== aujourdhui) { statsProduits = {}; statsTotalJour = 0; sauvegarderStatsProduits(); }
+            } catch(e) { statsProduits = {}; statsTotalJour = 0; }
+        }
+        afficherStatsProduits();
+    }
+
+    function sauvegarderStatsProduits() {
+        const data = { date: new Date().toLocaleDateString(), produits: statsProduits, totalJour: statsTotalJour };
+        localStorage.setItem('tabia_stats_produits', JSON.stringify(data));
+    }
+
+    function ajouterVenteStats(articles) {
+        let totalVente = 0;
+        articles.forEach(article => {
+            const nom = article.nom;
+            const quantite = article.quantite || 1;
+            const prix = article.prix;
+            if (!statsProduits[nom]) statsProduits[nom] = { quantite: 0, total: 0 };
+            statsProduits[nom].quantite += quantite;
+            statsProduits[nom].total += prix * quantite;
+            totalVente += prix * quantite;
+        });
+        statsTotalJour += totalVente;
+        sauvegarderStatsProduits();
+        afficherStatsProduits();
+    }
+
+    function afficherStatsProduits() {
+        const tbody = document.getElementById('statsProduitsBody');
+        const totalSpan = document.getElementById('statsTotalJour');
+        if (!tbody) return;
+        const produitsListe = Object.keys(statsProduits).sort();
+        if (produitsListe.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="empty-message">Aucune vente aujourd\'hui</td></tr>';
+            totalSpan.textContent = '0.00 DT';
+            return;
+        }
+        let html = '';
+        produitsListe.forEach(nom => {
+            const stats = statsProduits[nom];
+            html += `<tr><td class="produit-nom">${nom}</td><td class="produit-quantite" style="text-align:center">${stats.quantite}</td><td class="produit-total" style="text-align:right">${stats.total.toFixed(2)} DT</td></tr>`;
+        });
+        tbody.innerHTML = html;
+        totalSpan.textContent = `${statsTotalJour.toFixed(2)} DT`;
+    }
+
+    function resetStatsProduits() {
+        if (confirm("⚠️ Réinitialiser toutes les statistiques ?")) {
+            statsProduits = {};
+            statsTotalJour = 0;
+            sauvegarderStatsProduits();
+            afficherStatsProduits();
+            showNotification("📊 Statistiques réinitialisées", "#3498db");
+        }
+    }
+
+    function toggleStatsProduits() {
+        const content = document.getElementById('statsProduitsContent');
+        const icon = document.getElementById('statsToggleIcon');
+        if (content.style.display === 'none' || content.style.display === '') {
+            content.style.display = 'block';
+            icon.style.transform = 'rotate(0deg)';
+        } else {
+            content.style.display = 'none';
+            icon.style.transform = 'rotate(-90deg)';
+        }
+    }
+
+    // ========== AFFICHAGE COMMANDES GROUPÉES ==========
+    function afficherCommandesParTable() {
+        const commandesNonPayees = commandesFiltrees.filter(c => c.articles && c.articles.length > 0);
+        const totalAttente = commandesClients.filter(c => c.articles && c.articles.length > 0 && c.statut !== 'paye').length;
+        commandesCountSpan.innerText = `${totalAttente} en attente${rechercheActuelle ? ` (${commandesNonPayees.length} trouvées)` : ''}`;
+        if (commandesNonPayees.length === 0) {
+            commandesListDiv.innerHTML = rechercheActuelle ? `<div class="no-results">🔍 Aucune commande trouvée</div>` : '<div class="empty-message">Aucune commande en attente</div>';
+            return;
+        }
+        const commandesParTable = {};
+        commandesNonPayees.forEach(cmd => {
+            const tableKey = cmd.numeroTable || 'Emporter';
+            if (!commandesParTable[tableKey]) commandesParTable[tableKey] = [];
+            commandesParTable[tableKey].push(cmd);
+        });
+        const tablesOrdonnees = Object.keys(commandesParTable).sort((a, b) => {
+            if (a === 'Emporter') return 1;
+            if (b === 'Emporter') return -1;
+            return parseInt(a) - parseInt(b);
+        });
+        let html = '';
+        tablesOrdonnees.forEach(table => {
+            const commandesTable = commandesParTable[table];
+            const totalTable = commandesTable.reduce((sum, cmd) => sum + cmd.articles.reduce((s, a) => s + (a.prix * a.quantite), 0), 0);
+            html += `
+                <div class="groupe-table">
+                    <div class="groupe-table-header" onclick="toggleGroupe(this)">
+                        <div class="groupe-table-info">
+                            <i class="fas ${table === 'Emporter' ? 'fa-shopping-bag' : 'fa-chair'}"></i>
+                            <strong>${table === 'Emporter' ? '📦 À Emporter' : `🪑 Table ${table}`}</strong>
+                            <span class="groupe-table-count">(${commandesTable.length} commande${commandesTable.length > 1 ? 's' : ''})</span>
+                        </div>
+                        <div class="groupe-table-total">💰 ${totalTable.toFixed(2)} DT</div>
+                        <i class="fas fa-chevron-down groupe-toggle-icon"></i>
+                    </div>
+                    <div class="groupe-table-content">
+            `;
+            commandesTable.forEach(cmd => {
+                const total = cmd.articles.reduce((s, a) => s + (a.prix * a.quantite), 0);
+                const isEditing = currentEditingCommande && currentEditingCommande.id === cmd.id;
+                html += `
+                    <div class="commande-item ${isEditing ? 'editing' : ''}" data-id="${cmd.id}">
+                        ${isEditing ? '<div class="edit-badge"><i class="fas fa-edit"></i> En cours</div>' : ''}
+                        <div class="commande-header-line">
+                            <span class="commande-numero">#${cmd.numero}</span>
+                            <span class="commande-statut statut-${cmd.statut}">${getStatutTexte(cmd.statut)}</span>
+                        </div>
+                        <div class="commande-date">📅 ${cmd.date}</div>
+                        <div class="commande-preview">${cmd.articles.map(a => `<div>• ${a.quantite}x ${a.nom}</div>`).join('')}</div>
+                        <div class="commande-total-preview">💰 ${total.toFixed(2)} DT</div>
+                    </div>
+                `;
+            });
+            html += `</div></div>`;
+        });
+        commandesListDiv.innerHTML = html;
+        document.querySelectorAll('.commande-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.closest('.groupe-table-header')) return;
+                const id = parseInt(el.dataset.id);
+                const commande = commandesClients.find(c => c.id === id);
+                if (commande) selectionnerCommandePourEdition(commande);
+            });
+        });
+    }
+
+    function getStatutTexte(statut) {
+        const statuts = { 'en_attente': '⏳ En attente', 'en_preparation': '🍳 En préparation', 'terminee': '✅ Terminée', 'paye': '💰 Payée' };
+        return statuts[statut] || statut;
+    }
+
+    function toggleGroupe(header) {
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('.groupe-toggle-icon');
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            icon.style.transform = 'rotate(0deg)';
+        } else {
+            content.style.display = 'none';
+            icon.style.transform = 'rotate(-90deg)';
+        }
+    }
+
+    function mettreAJourAffichageCommandes() {
+        afficherCommandesParTable();
+    }
+
+    // ========== HISTORIQUE ==========
+    function renderHistorique() {
+        if (!salesHistory.length) {
+            historiqueListDiv.innerHTML = '<div class="empty-message">Aucune vente</div>';
+            return;
+        }
+        let html = "";
+        salesHistory.slice(0, 15).forEach(v => {
+            const tableInfo = v.numeroTable ? ` | Table ${v.numeroTable}` : "";
+            html += `<div class="vente-item"><div class="vente-header"><span>#${v.numero}${tableInfo}</span><span style="color:#e67e22;">${v.total.toFixed(2)} DT</span></div><div class="vente-produits">${v.articles.map(a => `${a.quantite}x ${a.nom}`).join(' · ')}</div></div>`;
+        });
+        historiqueListDiv.innerHTML = html;
+    }
+
+    function resetStats() {
+        if (confirm("⚠️ Réinitialiser tout l'historique ?")) {
+            salesHistory = [];
+            sauvegarderHistorique();
+            renderHistorique();
+            showNotification("📊 Historique effacé");
+        }
+    }
+
+    function showNotification(msg, bg = "#2c3e50") {
+        const notif = document.createElement("div");
+        notif.className = "notification";
+        notif.style.background = bg;
+        notif.innerHTML = msg;
+        document.body.appendChild(notif);
+        setTimeout(() => notif.remove(), 2500);
+    }
+
+    // ========== ÉCOUTE COMMANDES ==========
+    function ecouterNouvellesCommandes() {
+        setInterval(() => {
+            const stored = localStorage.getItem('tabia_commandes_clients');
+            if (stored) {
+                try {
+                    const nouvelles = JSON.parse(stored);
+                    const commandesActuellesIds = commandesClients.map(c => c.id);
+                    const nouvellesCommandes = nouvelles.filter(c => !commandesActuellesIds.includes(c.id) && c.articles?.length > 0);
+                    if (nouvellesCommandes.length > 0) {
+                        commandesClients = nouvelles;
+                        sauvegarderCommandes();
+                        appliquerRecherche();
+                        nouvellesCommandes.forEach(cmd => {
+                            showNotification(`📢 Nouvelle commande #${cmd.numero} - Table ${cmd.numeroTable || 'Emporter'}`, "#e67e22");
+                        });
+                    } else {
+                        commandesClients = nouvelles;
+                        appliquerRecherche();
+                    }
+                } catch(e) {}
+            }
+        }, 2000);
+    }
+
+    // ========== INIT ==========
+    document.addEventListener("DOMContentLoaded", () => {
+        chargerCommandes();
+        chargerHistorique();
+        renderCategories();
+        renderProducts();
+        appliquerRecherche();
+        ecouterNouvellesCommandes();
+        chargerStatsProduits();
+        
+        document.getElementById('clearTicketBtn').addEventListener('click', viderTicket);
+        document.getElementById('checkoutBtn').addEventListener('click', afficherModalPaiement);
+        document.getElementById('partialPayBtn').addEventListener('click', payerPartiel);
+        document.getElementById('resetStatsBtn').addEventListener('click', resetStats);
+        document.getElementById('newTicketBtn').addEventListener('click', nouveauTicket);
+        document.getElementById('saveChangesBtn').addEventListener('click', sauvegarderModifications);
+        document.getElementById('cancelEditBtn').addEventListener('click', annulerEdition);
+        document.getElementById('commandeManuelleBtn').addEventListener('click', creerCommandeManuelle);
+        document.getElementById('printTicketBtn').addEventListener('click', imprimerTicketCaisse);
+        
+        searchBtn.addEventListener('click', effectuerRecherche);
+        clearSearchBtn.addEventListener('click', effacerRecherche);
+        searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') effectuerRecherche(); });
+    });
+
+    async function payerPartiel() {
+        if (currentTicket.length === 0) {
+            showNotification("❌ Aucun article à payer", "#e74c3c");
+            return;
+        }
+        let message = "Sélectionnez les articles à payer (répondez par les numéros)\n\n";
+        currentTicket.forEach((item, index) => {
+            message += `${index + 1}. ${item.nom} x${item.quantite} = ${(item.prix * item.quantite).toFixed(2)} DT\n`;
+        });
+        message += "\nEntrez les numéros séparés par des virgules (ex: 1,3) ou 'all' pour tout payer:";
+        let input = prompt(message, "all");
+        if (!input) return;
+        let indicesAPayer = [];
+        if (input.toLowerCase() === 'all') {
+            indicesAPayer = currentTicket.map((_, i) => i);
+        } else {
+            indicesAPayer = input.split(',').map(n => parseInt(n.trim()) - 1).filter(i => i >= 0 && i < currentTicket.length);
+        }
+        if (indicesAPayer.length === 0) {
+            showNotification("❌ Aucun article sélectionné", "#e74c3c");
+            return;
+        }
+        const articlesAPayer = indicesAPayer.map(i => currentTicket[i]);
+        const total = articlesAPayer.reduce((sum, a) => sum + (a.prix * a.quantite), 0);
+        if (!confirm(`💰 Payer les articles sélectionnés : ${total.toFixed(2)} DT ?`)) return;
+        ajouterVenteStats(articlesAPayer);
+        const vente = {
+            id: Date.now(),
+            numero: currentEditingCommande ? currentEditingCommande.numero + "-P" + Math.floor(Math.random() * 100) : "P" + Math.floor(Math.random() * 10000),
+            date: new Date().toLocaleString(),
+            timestamp: Date.now(),
+            total: total,
+            mode: "Espèces/Carte",
+            type: currentEditingCommande ? "client_partiel" : "manuelle_partiel",
+            numeroTable: currentEditingCommande?.numeroTable,
+            articles: articlesAPayer.map(a => ({ nom: a.nom, quantite: a.quantite, prix: a.prix }))
+        };
+        salesHistory.unshift(vente);
+        sauvegarderHistorique();
+        renderHistorique();
+        if (currentEditingCommande) {
+            const articlesRestants = currentTicket.filter((_, i) => !indicesAPayer.includes(i));
+            if (articlesRestants.length === 0) {
+                commandesClients = commandesClients.filter(c => c.id !== currentEditingCommande.id);
+                showNotification(`✅ Commande #${currentEditingCommande.numero} entièrement payée`, "#27ae60");
+                annulerEdition();
+            } else {
+                currentEditingCommande.articles = articlesRestants;
+                const index = commandesClients.findIndex(c => c.id === currentEditingCommande.id);
+                if (index !== -1) commandesClients[index] = currentEditingCommande;
+                sauvegarderCommandes();
+                currentTicket = JSON.parse(JSON.stringify(articlesRestants));
+                renderTicket();
+                showNotification(`💰 Paiement partiel effectué. Reste: ${articlesRestants.reduce((s, a) => s + (a.prix * a.quantite), 0).toFixed(2)} DT`, "#3498db");
+            }
+        } else {
+            currentTicket = currentTicket.filter((_, i) => !indicesAPayer.includes(i));
+            renderTicket();
+            showNotification(`💰 Paiement partiel effectué. Reste: ${currentTicket.reduce((s, a) => s + (a.prix * a.quantite), 0).toFixed(2)} DT`, "#3498db");
+        }
+        appliquerRecherche();
+    }
+</script>
+</body>
+</html>
