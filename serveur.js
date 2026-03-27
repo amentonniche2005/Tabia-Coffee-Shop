@@ -33,7 +33,7 @@ app.use(session({
 }));
 
 // ========== MOT DE PASSE DE LA CAISSE ==========
-const CAISSE_PASSWORD = "00000"; // Modifiez ce code
+const CAISSE_PASSWORD = "0000"; // Modifiez ce code
 
 // ========== ROUTES DE SÉCURITÉ ==========
 
